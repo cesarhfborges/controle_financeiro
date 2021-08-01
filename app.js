@@ -1,27 +1,32 @@
+require('dotenv').config();
 const {app, BrowserWindow, screen} = require('electron');
 const url = require("url");
 const path = require("path");
 
 let appWindow;
 const env = {
-  production: false
+  production: process.env.PRODUCTION,
+  width: 800,
+  height: 600
 };
 
 function initWindow() {
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const w = width * .8;
+  const h = height * .8;
   appWindow = new BrowserWindow({
-    width: 360,
-    height: 640,
+    width: w,
+    height: h,
     webPreferences: {
       nodeIntegration: true
     },
     autoHideMenuBar: true,
-    x: width - 360,
-    y: height - 640
+    x: (width / 2) - (w / 2),
+    y: (height / 2) - (h / 2)
   });
 
   // Electron Build Path
-  if (env.production) {
+  if (env.production === 'true') {
     appWindow.loadURL(
       url.format({
         pathname: path.join(__dirname, `/dist/index.html`),
@@ -40,8 +45,9 @@ function initWindow() {
   }
 
   // Initialize the DevTools.
-  appWindow.webContents.openDevTools({ mode: 'detach' });
-
+  if (env.production === 'false') {
+    appWindow.webContents.openDevTools({mode: 'detach'});
+  }
   appWindow.on('closed', function () {
     appWindow = null;
   });
